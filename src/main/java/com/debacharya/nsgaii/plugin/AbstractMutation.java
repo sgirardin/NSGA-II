@@ -28,9 +28,11 @@ import com.debacharya.nsgaii.datastructure.Chromosome;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.debacharya.nsgaii.Configuration.CHROMOSOME_MUTATION_PROBABILITY;
+
 public abstract class AbstractMutation {
 
-	protected float mutationProbability = 0.03f;
+	protected float mutationProbability = CHROMOSOME_MUTATION_PROBABILITY;
 
 	public AbstractMutation() {}
 

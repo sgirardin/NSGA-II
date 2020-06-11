@@ -65,8 +65,8 @@ public class UniformCrossover extends AbstractCrossover {
 
 		for(int i = 0; i < chromosome1.getLength(); i++)
 			switch (Math.random() <= 0.5 ? 1 : 2) {
-				case 1: geneticCode.add(i, chromosome1.getGeneticCode().get(i).getCopy()); break;
-				case 2: geneticCode.add(i, chromosome2.getGeneticCode().get(i).getCopy()); break;
+				case 1: geneticCode.add(i, chromosome1.getChromosomeAlleles().get(i).getCopy()); break;
+				case 2: geneticCode.add(i, chromosome2.getChromosomeAlleles().get(i).getCopy()); break;
 			}
 
 		return new Chromosome(geneticCode);

@@ -24,6 +24,10 @@
 
 package com.debacharya.nsgaii;
 
+import ch.fhnw.mbis.aci.nsgaii.plugin.SchedulingObjectiveProvider;
+import ch.fhnw.mbis.aci.nsgaii.plugin.SchedulingPluginProvider;
+import ch.fhnw.mbis.aci.nsgaii.population.TrainCrewSet;
+import ch.fhnw.mbis.aci.nsgaii.population.TrainServiceSet;
 import com.debacharya.nsgaii.objectivefunction.AbstractObjectiveFunction;
 import com.debacharya.nsgaii.plugin.*;
 
@@ -32,139 +36,43 @@ import java.util.List;
 public class Configuration {
 
 	public static final String CONFIGURATION_NOT_SETUP = "The NSGA-II configuration object is not setup properly!";
-	public static final int DEFAULT_POPULATION_SIZE = 100;
-	public static final int DEFAULT_GENERATIONS = 25;
-	public static final int DEFAULT_CHROMOSOME_LENGTH = 20;
+
+	public static final int HARD_CONSTRAINT_PENALTY = - 1000;
+	public static final float CHROMOSOME_MUTATION_PROBABILITY = 0.04f;
 
 	public static List<AbstractObjectiveFunction> objectives;
-	public static String FITNESS_CALCULATOR_NULL = "The fitness calculation operation has not been setup. "				+
-													"You need to set the AbstractObjectiveFunction#fitnessCalculator "	+
-													"with an instance of FitnessCalculator!";
 
 	private int populationSize;
 	private int generations;
 	private int chromosomeLength;
+	private int geneLength;
 	private PopulationProducer populationProducer;
 	private ChildPopulationProducer childPopulationProducer;
 	private GeneticCodeProducer geneticCodeProducer;
 	private AbstractCrossover crossover;
 	private AbstractMutation mutation;
-	private FitnessCalculator fitnessCalculator;
 
-	public Configuration() {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH
-		);
-	}
 
-	public Configuration(int populationSize, int generations, int chromosomeLength) {
-		this(
-			populationSize,
-			generations,
-			chromosomeLength,
-			DefaultPluginProvider.defaultPopulationProducer(),
-			DefaultPluginProvider.defaultChildPopulationProducer(),
-			DefaultPluginProvider.defaultGeneticCodeProducer(),
-			ObjectiveProvider.provideSCHObjectives(chromosomeLength),
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
-			false,
-			true,
-			true
-		);
-	}
-
-	public Configuration(PopulationProducer populationProducer) {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH,
+	public Configuration(int populationSize,
+						 int nbGenerations,
+						 PopulationProducer populationProducer,
+						 AbstractCrossover crossover,
+						 AbstractMutation mutation) {
+		this(populationSize, nbGenerations,
 			populationProducer,
-			DefaultPluginProvider.defaultChildPopulationProducer(),
-			DefaultPluginProvider.defaultGeneticCodeProducer(),
-			ObjectiveProvider.provideSCHObjectives(Configuration.DEFAULT_CHROMOSOME_LENGTH),
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
+			SchedulingPluginProvider.defaultChildPopulationProducer(),
+			SchedulingPluginProvider.defaultGeneticCodeProducer(),
+			SchedulingObjectiveProvider.provideSCHObjectives(),
+			crossover,
+			mutation,
 			false,
 			true,
 			true
-		);
-	}
-
-	public Configuration(ChildPopulationProducer childPopulationProducer) {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH,
-			DefaultPluginProvider.defaultPopulationProducer(),
-			childPopulationProducer,
-			DefaultPluginProvider.defaultGeneticCodeProducer(),
-			ObjectiveProvider.provideSCHObjectives(Configuration.DEFAULT_CHROMOSOME_LENGTH),
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
-			false,
-			true,
-			true
-		);
-	}
-
-	public Configuration(GeneticCodeProducer geneticCodeProducer) {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH,
-			DefaultPluginProvider.defaultPopulationProducer(),
-			DefaultPluginProvider.defaultChildPopulationProducer(),
-			geneticCodeProducer,
-			ObjectiveProvider.provideSCHObjectives(Configuration.DEFAULT_CHROMOSOME_LENGTH),
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
-			false,
-			true,
-			true
-		);
-	}
-
-	public Configuration(List<AbstractObjectiveFunction> objectives) {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH,
-			DefaultPluginProvider.defaultPopulationProducer(),
-			DefaultPluginProvider.defaultChildPopulationProducer(),
-			DefaultPluginProvider.defaultGeneticCodeProducer(),
-			objectives,
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
-			false,
-			true,
-			true
-		);
-	}
-
-	public Configuration(FitnessCalculator fitnessCalculator) {
-		this(
-			Configuration.DEFAULT_POPULATION_SIZE,
-			Configuration.DEFAULT_GENERATIONS,
-			Configuration.DEFAULT_CHROMOSOME_LENGTH,
-			DefaultPluginProvider.defaultPopulationProducer(),
-			DefaultPluginProvider.defaultChildPopulationProducer(),
-			DefaultPluginProvider.defaultGeneticCodeProducer(),
-			ObjectiveProvider.provideSCHObjectives(Configuration.DEFAULT_CHROMOSOME_LENGTH),
-			new UniformCrossover(CrossoverParticipantCreatorProvider.selectByBinaryTournamentSelection()),
-			new SinglePointMutation(),
-			false,
-			true,
-			true,
-			fitnessCalculator
 		);
 	}
 
 	public Configuration(int populationSize,
 						 int generations,
-						 int chromosomeLength,
 						 PopulationProducer populationProducer,
 						 ChildPopulationProducer childPopulationProducer,
 						 GeneticCodeProducer geneticCodeProducer,
@@ -177,7 +85,8 @@ public class Configuration {
 
 		this.populationSize = populationSize;
 		this.generations = generations;
-		this.chromosomeLength = chromosomeLength;
+		this.geneLength = calculateGeneSize() * TrainServiceSet.getPopulation().size();
+		this.chromosomeLength = this.geneLength;
 		this.populationProducer = populationProducer;
 		this.childPopulationProducer = childPopulationProducer;
 		this.geneticCodeProducer = geneticCodeProducer;
@@ -188,35 +97,6 @@ public class Configuration {
 		Reporter.silent = silent;
 		Reporter.plotGraph = plotGraph;
 		Reporter.writeToDisk = writeToDisk;
-	}
-
-	public Configuration(int populationSize,
-						 int generations,
-						 int chromosomeLength,
-						 PopulationProducer populationProducer,
-						 ChildPopulationProducer childPopulationProducer,
-						 GeneticCodeProducer geneticCodeProducer,
-						 List<AbstractObjectiveFunction> objectives,
-						 AbstractCrossover crossover,
-						 AbstractMutation mutation,
-						 boolean silent,
-						 boolean plotGraph,
-						 boolean writeToDisk,
-						 FitnessCalculator fitnessCalculator) {
-
-		this(populationSize,
-				generations,
-				chromosomeLength,
-				populationProducer,
-				childPopulationProducer,
-				geneticCodeProducer,
-				objectives,
-				crossover,
-				mutation,
-				silent,
-				plotGraph,
-				writeToDisk);
-		this.fitnessCalculator = fitnessCalculator;
 	}
 
 	public int getPopulationSize() {
@@ -289,23 +169,6 @@ public class Configuration {
 		this.mutation = mutation;
 	}
 
-	public FitnessCalculator getFitnessCalculator() {
-
-		if(this.fitnessCalculator == null)
-			this.fitnessCalculator = FitnessCalculatorProvider.normalizedGeneticCodeValue(
-				0,
-				Math.pow(2, this.chromosomeLength) - 1,
-				0,
-				2
-			);
-
-		return this.fitnessCalculator;
-	}
-
-	public void setFitnessCalculator(FitnessCalculator fitnessCalculator) {
-		this.fitnessCalculator = fitnessCalculator;
-	}
-
 	public boolean isSetup() {
 		return (
 			this.populationSize != 0 				&&
@@ -347,7 +210,12 @@ public class Configuration {
 				"\nGenerations: " 																					+
 				this.generations 																					+
 				" [" 																								+
-				(this.generations > 0 ? "valid" : "invalid") 														+
+				(this.generations > 0 ? "valid" : "invalid")														+
+				"]" 																								+
+				"\nGene Length: " 																					+
+				this.geneLength				 																		+
+				" [" 																								+
+				(this.geneLength > 0 ? "valid" : "invalid") 														+
 				"]" 																								+
 				"\nChromosome Length: " 																			+
 				this.chromosomeLength				 																+
@@ -377,10 +245,14 @@ public class Configuration {
 				"\nMutation Operator: " 																			+
 				"[" 																								+
 				(this.mutation != null ? "provided" : "not provided") 												+
-				"]" 																								+
-				"\nFitness Calculator: " 																			+
-				"[" 																								+
-				(this.fitnessCalculator != null ? "provided" : "not provided") 										+
 				"]";
 	}
+
+	public static int calculateGeneSize(){
+		int geneSizeInBinary = 0;
+		geneSizeInBinary = Integer.toBinaryString(TrainCrewSet.getPopulation().size()).length();
+
+		return geneSizeInBinary;
+	}
+
 }

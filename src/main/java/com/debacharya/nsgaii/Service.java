@@ -29,6 +29,8 @@ import com.debacharya.nsgaii.datastructure.Chromosome;
 import com.debacharya.nsgaii.datastructure.Population;
 
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Service {
@@ -197,6 +199,25 @@ public class Service {
 		decimalPlace = Math.pow(10, decimalPlace);
 
 		return (Math.round(value * decimalPlace) / decimalPlace);
+	}
+
+	public static SortedMap<Double, Chromosome> returnSortedXAxisChromosomes(List<Chromosome> chromosomes){
+		SortedMap<Double, Chromosome> sortedChromosomes = new TreeMap<>();
+		for (Chromosome newChromosome : chromosomes) {
+			double xAxisValueNewChromosome = newChromosome.getObjectiveValues().get(0);
+			if(sortedChromosomes.containsKey(xAxisValueNewChromosome)){
+				double yAxisValueNewChromosome = newChromosome.getObjectiveValues().get(1);
+				double yAxisValueExistingChromosome = sortedChromosomes.get(xAxisValueNewChromosome).getObjectiveValues().get(1);
+				if(yAxisValueNewChromosome > yAxisValueExistingChromosome){
+					sortedChromosomes.put(xAxisValueNewChromosome, newChromosome);
+				}
+			} else {
+				sortedChromosomes.put(xAxisValueNewChromosome, newChromosome);
+			}
+
+		}
+
+		return  sortedChromosomes;
 	}
 
 	private static void swapForRank(List<Chromosome> populace, int firstIndex, int secondIndex) {

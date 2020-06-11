@@ -6,62 +6,10 @@
 
     <name>NSGA-II</name>
 
-    <parent>
-        <artifactId>oss-parent</artifactId>
-        <groupId>org.sonatype.oss</groupId>
-        <version>9</version>
-    </parent>
-
-    <groupId>com.debacharya</groupId>
+    <groupId>ch.fhnw.aci</groupId>
     <artifactId>nsgaii</artifactId>
-    <version>3.0.1</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
-
-    <inceptionYear>2019</inceptionYear>
-    <url>https://debacharya.com/nsgaii</url>
-
-    <description>
-        A NSGA-II implementation using Java. This implementation of NSGA-II algorithm is in pure reference to the
-        original published paper. This is not an effort to convert the originally implemented C code in Java.
-        The original C code by the authors has not be referred to while writing this implementation.
-        This is a fully customizable implementation of the NSGA-II algorithm, made as generic as possible.
-        This documentation assumes you have basic understanding of the NSGA-II algorithm. Apart from the core concepts
-        of the algorithm, everything else in this package can be implemented as per the user's choice and plugged
-        into the algorithm dynamically. Since NSGA-II is more like a set of protocols to follow as an algorithm rather
-        than a concrete implementation of every aspect, this package has been re-written from scratch keeping complete
-        customizability in mind. Apart from the core concepts of the algorithm, everything is considered to be a plugin
-        external to the algorithm that can be implemented by the user and dynamically plugged into the algorithm during
-        runtime as needed. This opens up the possibility of the package to be used simply as a PoC or be converted into
-        something much more complex according to the users needs.
-    </description>
-
-    <issueManagement>
-        <url>https://github.com/onclave/NSGA-II/issues</url>
-        <system>GitHub Issues</system>
-    </issueManagement>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-        </repository>
-    </distributionManagement>
-
-    <scm>
-        <connection>scm:git:git:https://github.com/onclave/NSGA-II.git</connection>
-        <url>https://github.com/onclave/NSGA-II</url>
-    </scm>
-
-    <developers>
-        <developer>
-            <name>Debabrata Acharya</name>
-            <email>debabrata@bloomscorp.com</email>
-        </developer>
-    </developers>
 
     <licenses>
         <license>
@@ -81,6 +29,19 @@
             <artifactId>jcommon</artifactId>
             <version>1.0.24</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -147,6 +108,22 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>13</source>
+                    <target>13</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>NSGA2Test</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

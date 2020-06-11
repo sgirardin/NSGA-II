@@ -44,14 +44,8 @@ public class NSGA2 {
 
 	private final Configuration configuration;
 
-	/**
-	 * creates an instance of `NSGA2` with a default configuration object that provides a default implementation of every plugin
-	 * needed by the algorithm to run. While this constructor is not of much use to the user, but this helps run a proof-of-concept
-	 * or the algorithm itself with all the default plugins filled in.
-	 */
-	public NSGA2() {
-		this.configuration = new Configuration();
-	}
+	private List<Population> allParentGenerations = new ArrayList<>();
+
 
 	/**
 	 * creates an instance of `NSGA2` by taking a configuration object as parameter.
@@ -87,6 +81,8 @@ public class NSGA2 {
 			)
 		);
 
+		allParentGenerations.add(parent);
+
 		Population child = this.preparePopulation(
 			this.configuration.getChildPopulationProducer().produce(
 				parent,
@@ -108,6 +104,7 @@ public class NSGA2 {
 					)
 				)
 			);
+			allParentGenerations.add(parent);
 
 			child = this.preparePopulation(
 				this.configuration.getChildPopulationProducer().produce(
@@ -120,8 +117,7 @@ public class NSGA2 {
 
 			Reporter.reportGeneration(parent, child, generation);
 		}
-
-		Reporter.terminate(child);
+		Reporter.terminate(parent, allParentGenerations);
 
 		return child;
 	}

@@ -26,12 +26,12 @@ package com.debacharya.nsgaii.datastructure;
 
 public abstract class AbstractAllele {
 
-	protected final Object gene;
+	protected final Object allele;
 
-	public AbstractAllele(Object gene) {
-		this.gene = gene;
+	public AbstractAllele(Object allele) {
+		this.allele = allele;
 	}
 
-	public abstract Object getGene();
+	public abstract Object getAllele();
 	public abstract AbstractAllele getCopy();
 }

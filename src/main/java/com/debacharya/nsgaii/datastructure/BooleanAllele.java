@@ -31,17 +31,17 @@ public class BooleanAllele extends AbstractAllele {
 	}
 
 	@Override
-	public Boolean getGene() {
-		return (Boolean) this.gene;
+	public Boolean getAllele() {
+		return (Boolean) this.allele;
 	}
 
 	@Override
 	public AbstractAllele getCopy() {
-		return new BooleanAllele((Boolean) this.gene);
+		return new BooleanAllele((Boolean) this.allele);
 	}
 
 	@Override
 	public String toString() {
-		return ((Boolean) this.gene ? "1" : "0");
+		return ((Boolean) this.allele ? "1" : "0");
 	}
 }

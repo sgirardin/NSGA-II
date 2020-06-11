@@ -24,6 +24,7 @@
 
 package com.debacharya.nsgaii.datastructure;
 
+import com.debacharya.nsgaii.Configuration;
 import com.debacharya.nsgaii.Service;
 
 import java.util.ArrayList;
@@ -33,27 +34,27 @@ public class Chromosome {
 
 	private final List<Double> objectiveValues;
 	private final List<Double> normalizedObjectiveValues;
-	private final List<AbstractAllele> geneticCode;
+	private final List<AbstractAllele> chromosomeAlleles;
 	private  List<Chromosome> dominatedChromosomes;
 	private double crowdingDistance = 0;
 	private int dominatedCount = 0;
 	private double fitness = Double.MIN_VALUE;
 	private int rank = -1;
 
-	public Chromosome(List<? extends AbstractAllele> geneticCode) {
+	public Chromosome(List<? extends AbstractAllele> chromosomeAlleles) {
 
-		this.geneticCode = new ArrayList<>();
+		this.chromosomeAlleles = new ArrayList<>();
 		this.objectiveValues = new ArrayList<>();
 		this.normalizedObjectiveValues = new ArrayList<>();
 		this.dominatedChromosomes = new ArrayList<>();
 
-		for(AbstractAllele allele : geneticCode)
-			this.geneticCode.add(allele.getCopy());
+		for(AbstractAllele allele : chromosomeAlleles)
+			this.chromosomeAlleles.add(allele.getCopy());
 	}
 
 	public Chromosome(Chromosome chromosome) {
 
-		this(chromosome.geneticCode);
+		this(chromosome.chromosomeAlleles);
 
 		for(int i = 0; i < chromosome.objectiveValues.size(); i++)
 			this.objectiveValues.add(i, chromosome.objectiveValues.get(i));
@@ -102,8 +103,8 @@ public class Chromosome {
 		else this.normalizedObjectiveValues.set(index, value);
 	}
 
-	public List<AbstractAllele> getGeneticCode() {
-		return geneticCode;
+	public List<AbstractAllele> getChromosomeAlleles() {
+		return chromosomeAlleles;
 	}
 
 	public double getCrowdingDistance() {
@@ -139,7 +140,7 @@ public class Chromosome {
 	}
 
 	public int getLength() {
-		return this.geneticCode.size();
+		return this.chromosomeAlleles.size();
 	}
 
 	public Chromosome getCopy() {
@@ -150,6 +151,22 @@ public class Chromosome {
 		this.dominatedCount = 0;
 		this.rank = Integer.MAX_VALUE;
 		this.dominatedChromosomes = new ArrayList<>();
+	}
+
+	public List<String> retrieveChromosomeGenes(){
+		List<String> genes = new ArrayList<>();
+
+		StringBuilder gene = new StringBuilder();
+		for (int i = 1; i <= this.chromosomeAlleles.size(); i++) {
+			AbstractAllele allele = this.chromosomeAlleles.get(i-1);
+			gene.append(allele.toString());
+
+			if((i % Configuration.calculateGeneSize()) == 0){
+				genes.add(gene.toString());
+				gene.delete(0, gene.length());
+			}
+		}
+		return genes;
 	}
 
 	@Override
